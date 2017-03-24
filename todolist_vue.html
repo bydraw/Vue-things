@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TODO　LIST　(VUE)</title>
+    <style>
+        body{
+            background-color: blanchedalmond;
+            color:blueviolet;
+        }
+        li{ 
+            cursor: pointer;
+            width:max-content;
+            list-style: none;
+            display: block;
+            margin: 10px auto;
+        }
+        #main{
+            text-align: center;
+        }
+        h1{ 
+            color:brown;
+            margin: 100px 0;
+        }
+        h3{
+            color:red;
+        }
+        .fade-enter-active, .fade-leave-active {
+        transition: opacity .3s
+        }
+        .fade-enter, .fade-leave-active {
+        opacity: 0
+        }
+    </style>
+</head>
+<body>
+<div id="main">
+<h1>TODO LIST</h1>
+<div id="todolist">
+    <!--add-->
+    <input v-model="newTodo" v-on:keyup.enter = "add(newTodo)" placeholder = "add a new todo...">
+    <button @click = "add(newTodo)">ADD</button>
+
+    <!--incompleted-->
+    <h2>incompleted</h2>
+    <ul>
+        <transgro>
+        <li v-for="(thing,index) in things" :key="thing" :style="{color:'blue'}">{{index+1}}.{{thing}}
+            <button @click="del(index)">√</button>
+        </li>
+        </transgro>
+    </ul>
+    <h3 v-show="Cong">Congratulations! You've done all the todos! </h3>
+
+    <!--compeleted-->
+    <h2>compeleted</h2>
+    <ul>
+        <transgro>
+        <li v-for="(thing,index) in things_ed" :key="thing" :style="{color:'green'}">{{index+1}}.{{thing}}
+            <button @click="back(index)">↑</button>
+        </li>
+        </transgro>
+    </ul>
+    <h3 v-show="Atten">Ahh...You've done nothing today...So hurry up:)</h3>
+</div>
+</div>
+<script src="https://unpkg.com/vue@2.2.4/dist/vue.js"></script>
+<script>
+    //过渡复用
+    Vue.component('transgro',{
+        template:'<transition-group tag="li" name="fade"><slot></slot></transition-group>'
+    })
+    
+    var todolist = new Vue({
+        el:"#todolist",
+        data:{
+            newTodo:'',
+            things:[
+                'Get up',
+                'Breakfast',
+                'Learn driving'
+                ],
+            things_ed:[],
+            Cong:false,
+            Atten:true,
+        },
+        methods:{
+            //添加
+            add:function (newTodo){
+                if(newTodo.length == 0 || newTodo.replace(/ /g,'') == '' ){
+                    newTodo = '';
+                    return;
+                }
+                this.things.push(this.newTodo);
+                this.newTodo = '';
+                this.Cong = false;
+            },
+            //完成
+            del:function(index){
+                this.things_ed.push(this.things[index]);
+                this.Atten = false;
+                this.things.splice(index, 1);
+            },
+            //返回
+            back:function(index){
+                this.things.push(this.things_ed[index]);
+                this.things_ed.splice(index, 1);
+            },
+        },
+        //监听todo个数变化
+        watch:{
+            things:function(){
+                switch(this.things.length){
+                    case 0:this.Cong = true;
+                    break;
+                    default:this.Cong = false;
+                }
+            },
+            things_ed:function(){
+                switch(this.things_ed.length){
+                    case 0:this.Atten = true;
+                    break;
+                    default:this.Atten = false;
+                }
+            }
+        }
+        
+    })
+</script>
+</body>
+</html>
